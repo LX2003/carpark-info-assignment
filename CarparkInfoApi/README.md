@@ -222,11 +222,6 @@ DELETE /api/favourites/{carParkNo}
 Favourites are global for this assignment. Authentication and user-specific
 favourites can be added later as an extension.
 
-## Additional Considerations
-
-The following items are not mandatory for the assignment, but they are important
-discussion points for a production-ready version of this solution.
-
 ### Large Dataset Support
 
 The current solution reads the CSV, validates each row, and saves the records in
