@@ -10,6 +10,37 @@ ASP.NET Core 6 Web API implementation for the HDB carpark information assignment
 - Swagger/OpenAPI
 - xUnit
 
+## Prerequisites
+
+Install the .NET 6 SDK before running or testing the project:
+
+```text
+https://dotnet.microsoft.com/en-us/download/dotnet/6.0
+```
+
+Verify that the SDK is available:
+
+```powershell
+dotnet --list-sdks
+```
+
+You should see a `6.0.x` SDK version. If the command says `No .NET SDKs were
+found`, only the runtime is installed and `dotnet run` / `dotnet test` will not
+work.
+
+On the development machine used for this submission, the SDK was installed in
+the user profile. If `dotnet` does not work but this path exists, use:
+
+```powershell
+C:\Users\tanle\.dotnet\dotnet.exe
+```
+
+For example:
+
+```powershell
+C:\Users\tanle\.dotnet\dotnet.exe run --project .\src\CarparkInfo.Api\CarparkInfo.Api.csproj
+```
+
 ## Run
 
 ```powershell
