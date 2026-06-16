@@ -71,17 +71,7 @@ CarparkInfoApi/
 dotnet run --project .\src\CarparkInfo.Api\CarparkInfo.Api.csproj -- --import ".\data\hdb-carpark-information-20220824010400.csv"
 ```
 
-Expected result:
-
-```text
-Imported 2181 carpark rows.
-```
-
-This command-line import is the recommended testing method because it avoids
-browser and Swagger URL-encoding differences for local file paths.
-
-The same import service is also exposed through the API, but the command-line
-import above is more reliable for reviewers:
+The same import service is also exposed through the API:
 
 ```http
 POST /api/imports/carparks?filePath=.\data\hdb-carpark-information-20220824010400.csv
@@ -116,29 +106,7 @@ site. This is normal for local ASP.NET Core development.
 
 ### 2. Import the CSV
 
-Before searching carparks, load the provided dataset. The recommended method is
-to stop the API, run the command-line import, then start the API again.
-
-In PowerShell:
-
-```powershell
-dotnet run --project .\src\CarparkInfo.Api\CarparkInfo.Api.csproj -- --import ".\data\hdb-carpark-information-20220824010400.csv"
-```
-
-Expected result:
-
-```text
-Imported 2181 carpark rows.
-```
-
-Then start the API again:
-
-```powershell
-dotnet run --project .\src\CarparkInfo.Api\CarparkInfo.Api.csproj
-```
-
-You can also test the import through Swagger, but command-line import is more
-reliable for local file paths.
+Before searching carparks, load the provided dataset.
 
 In Swagger:
 
@@ -147,7 +115,7 @@ In Swagger:
 3. Enter this value for `filePath`:
 
 ```text
-.\data\hdb-carpark-information-20220824010400.csv
+.\hdb-carpark-information-20220824010400.csv
 ```
 
 4. Click `Execute`.
