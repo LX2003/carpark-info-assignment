@@ -222,6 +222,100 @@ DELETE /api/favourites/{carParkNo}
 Favourites are global for this assignment. Authentication and user-specific
 favourites can be added later as an extension.
 
+## Additional Considerations
+
+The following items are not mandatory for the assignment, but they are important
+discussion points for a production-ready version of this solution.
+
+### Large Dataset Support
+
+The current solution reads the CSV, validates each row, and saves the records in
+one database transaction. This is suitable for the supplied assignment dataset.
+
+If the source file grows significantly, the import can be improved by:
+
+- Streaming rows from the CSV instead of loading the entire file into memory.
+- Processing records in configurable batches.
+- Using database bulk insert or bulk upsert instead of tracking every row as an
+  EF Core entity.
+- Moving from SQLite to SQL Server or PostgreSQL for stronger write throughput,
+  concurrency, indexing, monitoring, and operational support.
+- Keeping indexes on fields used by the API filters, such as `gantry_height`,
+  `night_parking`, and the parking-rule foreign keys.
+- Running the import as a scheduled background job instead of only through a
+  manual command or API call.
+
+The current implementation already includes database indexes on `GantryHeight`
+and `NightParking`, which directly support the vehicle-height and night-parking
+filters.
+
+### Minimal Human Intervention For Job Recovery
+
+The current CSV import is atomic: when any row fails validation or persistence,
+the entire transaction is rolled back. This prevents partial imports and keeps
+the database consistent.
+
+For stronger automated recovery, a production version can add an `ImportBatch`
+table with:
+
+- Source file name
+- File checksum
+- Job status, such as `Pending`, `Processing`, `Completed`, or `Failed`
+- Started and completed timestamps
+- Number of rows processed
+- Error message for failed imports
+
+With this metadata, the system can:
+
+- Detect and skip duplicate files.
+- Retry failed imports automatically.
+- Resume or reprocess failed files with minimal manual work.
+- Give operations teams a clear audit trail for every daily delta file.
+
+### Secure Coding Practices
+
+The current implementation follows several secure coding basics:
+
+- EF Core parameterizes database queries, reducing SQL injection risk.
+- CSV headers and field types are validated before records are saved.
+- The import runs inside a transaction to avoid corrupted partial data.
+- Unknown carpark numbers are rejected when adding favourites.
+- The generated SQLite database is ignored by Git so local data is not committed
+  accidentally.
+
+Additional hardening for production can include:
+
+- Restricting imports to a configured safe folder instead of accepting any file
+  path from the API request.
+- Disabling or protecting the import API in public environments.
+- Adding request size limits and rate limiting.
+- Logging import errors with enough context for troubleshooting without exposing
+  sensitive values.
+- Enforcing HTTPS in deployed environments.
+- Moving secrets and connection strings into secure configuration providers.
+
+### API Authentication And Authorization
+
+Authentication and authorization are not implemented because they are listed as
+optional considerations in the assignment.
+
+A production version can use JWT bearer authentication with role-based
+authorization:
+
+- `Admin`: allowed to run CSV imports and manage operational jobs.
+- `User`: allowed to search carparks and manage favourites.
+
+If user-specific favourites are required, the current global favourite model can
+be extended to:
+
+```text
+User 1--* Favourite *--1 Carpark
+```
+
+The `Favourite` table would then use a composite key such as
+`(user_id, car_park_no)` so each user can maintain their own favourite carpark
+list.
+
 ## Normalized ERD
 
 ```mermaid
